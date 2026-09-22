@@ -14,37 +14,33 @@
  * limitations under the License.
  */
 
-package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient;
+package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.springrestclientdecorator;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import java.net.URI;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
-public abstract class AbstractSpringRestClientFacade implements ISpringRestClientFacade {
+public abstract class AbstractSpringRestClientDecorator implements ISpringRestClientDecorator {
 
   private final RestClient restClient;
-  private final PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
   private final CircuitBreaker circuitBreaker;
   private final RateLimiter rateLimiter;
   private final MediaType requestMediaType;
   private final MediaType responseMediaType;
 
-  public AbstractSpringRestClientFacade(
-      SpringRestClientFactory.HttpClientAndApachePoolingConnManagerDto
-          httpClientAndApachePoolingConnManagerDto,
+  public AbstractSpringRestClientDecorator(
+      RestClient restClient,
       CircuitBreaker circuitBreaker,
       RateLimiter rateLimiter,
       MediaType requestMediaType,
       MediaType responseMediaType) {
-    this.restClient = httpClientAndApachePoolingConnManagerDto.restClient();
-    this.poolingHttpClientConnectionManager = httpClientAndApachePoolingConnManagerDto.manager();
+    this.restClient = restClient;
     this.circuitBreaker = circuitBreaker;
     this.rateLimiter = rateLimiter;
     this.requestMediaType = requestMediaType;

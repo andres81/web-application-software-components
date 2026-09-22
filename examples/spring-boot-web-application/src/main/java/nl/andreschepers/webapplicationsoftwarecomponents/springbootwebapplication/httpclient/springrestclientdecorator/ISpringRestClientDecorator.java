@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient;
+package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.springrestclientdecorator;
 
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
-public interface ISpringRestClientFacade {
+public interface ISpringRestClientDecorator {
 
   <T> ResponseEntity<T> makeGetRequest(
       URI uri,
