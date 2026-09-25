@@ -16,10 +16,13 @@
 
 package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication;
 
+import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.configurationproperties.SpringRestClientDecoratorConfigurationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
+@EnableConfigurationProperties(SpringRestClientDecoratorConfigurationProperties.class)
 public class SpringBootWebApplication {
 
   public static void main(String[] args) {

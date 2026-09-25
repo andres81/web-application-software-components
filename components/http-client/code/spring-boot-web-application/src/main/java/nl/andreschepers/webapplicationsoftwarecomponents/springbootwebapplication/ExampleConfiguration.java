@@ -20,16 +20,21 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
-import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.springrestclientdecorator.ApacheHttpClientJsonRequestJsonResponseTypedSpringRestClientDecoratorImplementation;
-import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.springrestclientdecorator.ISpringRestClientDecorator;
+import lombok.RequiredArgsConstructor;
+import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.configurationproperties.SpringRestClientDecoratorConfigurationProperties;
 import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.factory.SpringRestClientFactory;
 import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.factory.TLSVersion;
-import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.springrestclientdecorator.ApacheHttpClientJsonRequestJsonResponseTypedSpringRestClientDecoratorImplementation;
+import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.springrestclientdecorator.ISpringRestClientDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class ExampleConfiguration {
+
+  private final SpringRestClientDecoratorConfigurationProperties
+      springRestClientDecoratorConfigurationProperties;
 
   @Bean("send-email-http-client")
   public ISpringRestClientDecorator apacheHttpClient() {
@@ -45,14 +50,15 @@ public class ExampleConfiguration {
       createRestClientPoolManagerPair() {
     return SpringRestClientFactory.createWithApachePoolingConnManager(
         new SpringRestClientFactory.ConfigurationDto(
-            2000,
-            2000,
-            2000,
-            200,
-            50,
-            3000,
-            NoopHostnameVerifier.INSTANCE,
+            springRestClientDecoratorConfigurationProperties.getConnectionTimeoutMs(),
+            springRestClientDecoratorConfigurationProperties.getSocketTimeoutMs(),
+            springRestClientDecoratorConfigurationProperties.getConnectionRequestTimeoutMs(),
+            springRestClientDecoratorConfigurationProperties.getMaxTotalConnections(),
+            springRestClientDecoratorConfigurationProperties.getMaxConnectionsPerRoute(),
+            springRestClientDecoratorConfigurationProperties.getTlsHandshakeTimeout(),
             null,
-            TLSVersion.TLS_1_3));
+            springRestClientDecoratorConfigurationProperties
+                .getTlsVersions()
+                .toArray(new TLSVersion[0])));
   }
 }

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient;
+package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.factory;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -25,7 +24,6 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.*;
-import org.apache.hc.core5.http.ssl.TLS;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.util.Timeout;
@@ -38,36 +36,35 @@ public final class SpringRestClientFactory {
   private SpringRestClientFactory() {}
 
   public static HttpClientAndApachePoolingConnManagerDto createWithApachePoolingConnManager(
-      WithApachePoolingConnManagerGivenExistingSSLContextConfigurationDto configuration) {
+      ConfigurationDto configuration) {
 
     PoolingHttpClientConnectionManager manager =
         PoolingHttpClientConnectionManagerBuilder.create()
             .setTlsSocketStrategy(
                 ClientTlsStrategyBuilder.create()
-                    .setSslContext(configuration.sslContext())
-                    .setHostnameVerifier(configuration.hostnameVerifier())
-                    .setTlsVersions(configuration.tlsVersions())
+                    .setSslContext(configuration.sslContext)
+                    .setHostnameVerifier(new DefaultHostnameVerifier())
+                    .setTlsVersions(TLSVersion.getApacheTlsVersions(configuration.tlsVersion))
                     .buildClassic())
             .setDefaultTlsConfig(
                 TlsConfig.custom()
-                    .setHandshakeTimeout(
-                        Timeout.ofMilliseconds(configuration.tlsHandshakeTimeout()))
+                    .setHandshakeTimeout(Timeout.ofMilliseconds(configuration.tlsHandshakeTimeout))
                     .build())
             .setDefaultConnectionConfig(
                 ConnectionConfig.custom()
-                    .setConnectTimeout(Timeout.ofMilliseconds(configuration.connectionTimeoutMs()))
-                    .setSocketTimeout(Timeout.ofMilliseconds(configuration.socketTimeoutMs()))
+                    .setConnectTimeout(Timeout.ofMilliseconds(configuration.connectionTimeoutMs))
+                    .setSocketTimeout(Timeout.ofMilliseconds(configuration.socketTimeoutMs))
                     .build())
-            .setMaxConnPerRoute(configuration.maxConnPerRoute())
-            .setMaxConnTotal(configuration.maxConnTotal())
-            .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
-            .setConnPoolPolicy(PoolReusePolicy.LIFO)
+            .setMaxConnPerRoute(configuration.maxConnPerRoute)
+            .setMaxConnTotal(configuration.maxConnTotal)
+            .setPoolConcurrencyPolicy(configuration.poolConcurrencyPolicy)
+            .setConnPoolPolicy(configuration.poolReusePolicy)
             .build();
 
     var requestConfig =
         RequestConfig.custom()
             .setConnectionRequestTimeout(
-                Timeout.ofMilliseconds(configuration.connectionRequestTimeoutMs()))
+                Timeout.ofMilliseconds(configuration.connectionRequestTimeoutMs))
             .build();
 
     var client =
@@ -82,16 +79,40 @@ public final class SpringRestClientFactory {
     return new HttpClientAndApachePoolingConnManagerDto(restClient, manager);
   }
 
-  public record WithApachePoolingConnManagerGivenExistingSSLContextConfigurationDto(
+  public record ConfigurationDto(
       int connectionTimeoutMs,
       int socketTimeoutMs,
       int connectionRequestTimeoutMs,
       int maxConnTotal,
       int maxConnPerRoute,
       int tlsHandshakeTimeout,
-      HostnameVerifier hostnameVerifier,
       SSLContext sslContext,
-      TLS... tlsVersions) {}
+      PoolConcurrencyPolicy poolConcurrencyPolicy,
+      PoolReusePolicy poolReusePolicy,
+      TLSVersion... tlsVersion) {
+
+    public ConfigurationDto(
+        int connectionTimeoutMs,
+        int socketTimeoutMs,
+        int connectionRequestTimeoutMs,
+        int maxConnTotal,
+        int maxConnPerRoute,
+        int tlsHandshakeTimeout,
+        SSLContext sslContext,
+        TLSVersion... tlsVersion) {
+      this(
+          connectionTimeoutMs,
+          socketTimeoutMs,
+          connectionRequestTimeoutMs,
+          maxConnTotal,
+          maxConnPerRoute,
+          tlsHandshakeTimeout,
+          sslContext,
+          PoolConcurrencyPolicy.STRICT,
+          PoolReusePolicy.LIFO,
+          tlsVersion);
+    }
+  }
 
   public record HttpClientAndApachePoolingConnManagerDto(
       RestClient restClient, PoolingHttpClientConnectionManager manager) {}

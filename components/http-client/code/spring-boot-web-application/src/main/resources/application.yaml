@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: spring-boot-web-application
+
+nl:
+  andreschepers:
+    example:
+      springrestclient:
+        email:
+          connection-timeout-ms: 1000
+          socket-timeout-ms: 1000
+          connection-request-timeout-ms: 1000
+          max-total-connections: 200
+          max-connections-per-route: 50
+          tls-handshake-timeout: 3000
+          tls-versions:
+            - TLS_1_3
+          circuit-breaker-properties:
+            enabled: true
+            failure-rate-threshold: 2000
+            request-volume-threshold: 2000
+          rate-limiter-properties:
+            enabled: true
+            limit-for-period: 1000
+            period: 1000
+

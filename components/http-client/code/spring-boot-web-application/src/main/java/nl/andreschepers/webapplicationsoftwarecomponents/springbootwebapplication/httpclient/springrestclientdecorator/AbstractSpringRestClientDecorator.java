@@ -34,7 +34,7 @@ public abstract class AbstractSpringRestClientDecorator implements ISpringRestCl
   private final MediaType requestMediaType;
   private final MediaType responseMediaType;
 
-  public AbstractSpringRestClientDecorator(
+  protected AbstractSpringRestClientDecorator(
       RestClient restClient,
       CircuitBreaker circuitBreaker,
       RateLimiter rateLimiter,
