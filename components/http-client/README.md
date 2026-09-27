@@ -1,11 +1,15 @@
 # HTTP Client software component
 
+## Introduction
+
 Taking the book
 [Domain-Driven Design by Vaughn Vernon](https://vaughnvernon.com/)
 as a starting point, then the diagram in the book on page 463, shows a HTTP
 client as a facade.
 
 ![HTTP client DDD Vaughn Vernon](./HTTP%20client%20diagrams.jpg)
+
+## Target Architecture (structure)
 
 But, looking at the definition of a Facade according to the book of the
 [Gang of Four](https://en.wikipedia.org/wiki/Design_Patterns) (GoF):
@@ -20,3 +24,19 @@ bounded context that the HttpClient is supposed to target?
 To illustrate this:
 
 ![Concrete http client full diagram](./HTTP%20client%20diagrams-Page-http-client-facade-concrete.jpg)
+
+## Creation
+
+The target architecture, or better said, structure is clear now. But how to get
+to that structure? How to create the components? And how? Or: Who does what when
+and how?
+
+The [Gang of Four](https://en.wikipedia.org/wiki/Design_Patterns) (GoF)
+again to the
+rescue: [The Factory pattern](https://en.wikipedia.org/wiki/Factory_method_pattern).
+
+## How it should work
+
+THe social desirable functionality is an http client that has a rate limiter
+and circuit breaker. However, that is nice to claim that it hás it, but are
+we sure those components are used the right way? What ís the right way?
