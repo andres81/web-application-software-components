@@ -35,8 +35,49 @@ The [Gang of Four](https://en.wikipedia.org/wiki/Design_Patterns) (GoF)
 again to the
 rescue: [The Factory pattern](https://en.wikipedia.org/wiki/Factory_method_pattern).
 
+```mermaid
+sequenceDiagram
+    create participant srcfConfig as SpringRestClientFactory.ConfigurationDto
+    Client Code ->> srcfConfig: srcfConfig = create()
+    Client Code ->> SpringRestClientFactory: createWithApachePoolingConnManager(srcfConfig)
+    SpringRestClientFactory --) Client Code: SpringRestClientFactory.HttpClientAndApachePoolingConnManagerDto
+    Client Code ->> OTLPApachePoolMetrics: configureOTLPApachePoolMetrics(dto.manager())
+    create participant httpClient as ApacheHttpClientJsonRequestJsonResponseTypedSpringRestClientDecoratorImplementation
+    Client Code ->> httpClient: create(<br>dto.restClient()<br>dto.manager()<br>CircuitBreaker<br>RateLimiter)
+```
+
 ## How it should work
 
 THe social desirable functionality is an http client that has a rate limiter
 and circuit breaker. However, that is nice to claim that it hás it, but are
 we sure those components are used the right way? What ís the right way?
+
+## DevOps
+
+### Logging
+
+#### TLS
+
+
+##### Handshake logging
+
+Add to your VM arguments:
+
+```java
+-Djavax.net.debug=ssl:handshake:verbose:keymanager:trustmanager
+```
+
+##### Apache HttpClient logging (connection lifecycle)
+
+Configure logging for these packages (example for Log4j / Logback):
+
+org.apache.http — general client events.<br />
+org.apache.http.wire — raw bytes on the wire (shows TLS-encrypted bytes, not plaintext).<br />
+org.apache.http.impl.conn — connection manager events (leasing, releasing, creating).<br />
+
+*Set levels:*
+
+org.apache.http.impl.conn = DEBUG<br />
+org.apache.http = INFO<br />
+org.apache.http.wire = DEBUG (use cautiously)<br />
+

@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.configurationproperties.SpringRestClientDecoratorConfigurationProperties;
 import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.factory.SpringRestClientFactory;
 import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.factory.TLSVersion;
+import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.monitoring.OTLPApachePoolMetrics;
 import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.springrestclientdecorator.ApacheHttpClientJsonRequestJsonResponseTypedSpringRestClientDecoratorImplementation;
 import nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.springrestclientdecorator.ISpringRestClientDecorator;
 import org.springframework.context.annotation.Bean;
@@ -36,9 +37,16 @@ public class ExampleConfiguration {
   private final SpringRestClientDecoratorConfigurationProperties
       springRestClientDecoratorConfigurationProperties;
 
+  /**
+   * @return
+   */
   @Bean("send-email-http-client")
   public ISpringRestClientDecorator apacheHttpClient() {
     var clientManagerPairDto = createRestClientPoolManagerPair();
+
+    OTLPApachePoolMetrics.configureOTLPApachePoolMetrics(
+        clientManagerPairDto.manager(), "email.http.client", "email.http.apache.pool");
+
     return new ApacheHttpClientJsonRequestJsonResponseTypedSpringRestClientDecoratorImplementation(
         clientManagerPairDto.restClient(),
         clientManagerPairDto.manager(),
