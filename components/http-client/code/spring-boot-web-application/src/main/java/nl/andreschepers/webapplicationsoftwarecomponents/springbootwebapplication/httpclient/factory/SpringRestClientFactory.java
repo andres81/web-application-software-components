@@ -27,7 +27,6 @@ import org.apache.hc.client5.http.ssl.*;
 import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.util.Timeout;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
@@ -74,12 +73,16 @@ public final class SpringRestClientFactory {
             .build();
 
     var factory = new HttpComponentsClientHttpRequestFactory(client);
-    var bufferedFactory = new BufferingClientHttpRequestFactory(factory);
-    var restClient = RestClient.builder().requestFactory(bufferedFactory).build();
+    var restClientBuilder = RestClient.builder();
+    if (configuration.bufferRequestResponse) {
+      restClientBuilder.bufferContent((_, _) -> true);
+    }
+    var restClient = restClientBuilder.requestFactory(factory).build();
     return new HttpClientAndApachePoolingConnManagerDto(restClient, manager);
   }
 
   public record ConfigurationDto(
+      boolean bufferRequestResponse,
       int connectionTimeoutMs,
       int socketTimeoutMs,
       int connectionRequestTimeoutMs,
@@ -101,6 +104,7 @@ public final class SpringRestClientFactory {
         SSLContext sslContext,
         TLSVersion... tlsVersion) {
       this(
+          true,
           connectionTimeoutMs,
           socketTimeoutMs,
           connectionRequestTimeoutMs,

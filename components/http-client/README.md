@@ -25,6 +25,8 @@ To illustrate this:
 
 ![Concrete http client full diagram](./HTTP%20client%20diagrams-Page-http-client-facade-concrete.jpg)
 
+### Structure (class diagram)
+
 ## Creation
 
 The target architecture, or better said, structure is clear now. But how to get
@@ -34,6 +36,10 @@ and how?
 The [Gang of Four](https://en.wikipedia.org/wiki/Design_Patterns) (GoF)
 again to the
 rescue: [The Factory pattern](https://en.wikipedia.org/wiki/Factory_method_pattern).
+
+### Structure (class diagram)
+
+### Behavior (functionality)
 
 ```mermaid
 sequenceDiagram

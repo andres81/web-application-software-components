@@ -19,7 +19,6 @@ package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplicati
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import lombok.Getter;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
@@ -27,19 +26,13 @@ import org.springframework.web.client.RestClient;
 public class ApacheHttpClientJsonRequestJsonResponseTypedSpringRestClientDecoratorImplementation
     extends AbstractSpringRestClientDecorator {
 
-  private final PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
-
   public ApacheHttpClientJsonRequestJsonResponseTypedSpringRestClientDecoratorImplementation(
-      RestClient restClient,
-      PoolingHttpClientConnectionManager poolingHttpClientConnectionManager,
-      CircuitBreaker circuitBreaker,
-      RateLimiter rateLimiter) {
+      RestClient restClient, CircuitBreaker circuitBreaker, RateLimiter rateLimiter) {
     super(
         restClient,
         circuitBreaker,
         rateLimiter,
         MediaType.APPLICATION_JSON,
         MediaType.APPLICATION_JSON);
-    this.poolingHttpClientConnectionManager = poolingHttpClientConnectionManager;
   }
 }

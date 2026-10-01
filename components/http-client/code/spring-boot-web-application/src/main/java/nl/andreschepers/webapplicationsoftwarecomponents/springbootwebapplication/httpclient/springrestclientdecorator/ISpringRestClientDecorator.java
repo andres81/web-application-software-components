@@ -17,6 +17,8 @@
 package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplication.httpclient.springrestclientdecorator;
 
 import java.net.URI;
+import java.util.function.Consumer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
@@ -24,12 +26,14 @@ public interface ISpringRestClientDecorator {
 
   <T> ResponseEntity<T> makeGetRequest(
       URI uri,
+      Consumer<HttpHeaders> headersConsumer,
       Class<T> responseType,
       RestClient.ResponseSpec.ErrorHandler errorHandler4XX,
       RestClient.ResponseSpec.ErrorHandler errorHandler5XX);
 
   <T, R> ResponseEntity<T> makePostRequest(
       URI uri,
+      Consumer<HttpHeaders> headersConsumer,
       R body,
       Class<T> responseType,
       RestClient.ResponseSpec.ErrorHandler errorHandler4XX,
@@ -37,6 +41,7 @@ public interface ISpringRestClientDecorator {
 
   <T, R> ResponseEntity<T> makePutRequest(
       URI uri,
+      Consumer<HttpHeaders> headersConsumer,
       R body,
       Class<T> responseType,
       RestClient.ResponseSpec.ErrorHandler errorHandler4XX,

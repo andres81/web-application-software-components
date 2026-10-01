@@ -19,8 +19,10 @@ package nl.andreschepers.webapplicationsoftwarecomponents.springbootwebapplicati
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import java.net.URI;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +52,7 @@ public abstract class AbstractSpringRestClientDecorator implements ISpringRestCl
   @Override
   public <T> ResponseEntity<T> makeGetRequest(
       URI uri,
+      Consumer<HttpHeaders> headersConsumer,
       Class<T> responseType,
       RestClient.ResponseSpec.ErrorHandler errorHandler4XX,
       RestClient.ResponseSpec.ErrorHandler errorHandler5XX) {
@@ -58,6 +61,7 @@ public abstract class AbstractSpringRestClientDecorator implements ISpringRestCl
             restClient
                 .get()
                 .uri(uri)
+                .headers(headersConsumer)
                 .accept(responseMediaType)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, errorHandler4XX)
@@ -68,6 +72,7 @@ public abstract class AbstractSpringRestClientDecorator implements ISpringRestCl
   @Override
   public <T, R> ResponseEntity<T> makePostRequest(
       URI uri,
+      Consumer<HttpHeaders> headersConsumer,
       R body,
       Class<T> responseType,
       RestClient.ResponseSpec.ErrorHandler errorHandler4XX,
@@ -77,6 +82,7 @@ public abstract class AbstractSpringRestClientDecorator implements ISpringRestCl
             restClient
                 .post()
                 .uri(uri)
+                .headers(headersConsumer)
                 .contentType(requestMediaType)
                 .body(requestBody)
                 .accept(responseMediaType)
@@ -90,6 +96,7 @@ public abstract class AbstractSpringRestClientDecorator implements ISpringRestCl
   @Override
   public <T, R> ResponseEntity<T> makePutRequest(
       URI uri,
+      Consumer<HttpHeaders> headersConsumer,
       R body,
       Class<T> responseType,
       RestClient.ResponseSpec.ErrorHandler errorHandler4XX,
@@ -99,6 +106,7 @@ public abstract class AbstractSpringRestClientDecorator implements ISpringRestCl
             restClient
                 .put()
                 .uri(uri)
+                .headers(headersConsumer)
                 .contentType(requestMediaType)
                 .body(requestBody)
                 .accept(responseMediaType)

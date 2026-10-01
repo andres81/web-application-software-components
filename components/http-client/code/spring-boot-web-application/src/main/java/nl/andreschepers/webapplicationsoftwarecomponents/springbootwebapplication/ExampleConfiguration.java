@@ -42,6 +42,7 @@ public class ExampleConfiguration {
    */
   @Bean("send-email-http-client")
   public ISpringRestClientDecorator apacheHttpClient() {
+
     var clientManagerPairDto = createRestClientPoolManagerPair();
 
     OTLPApachePoolMetrics.configureOTLPApachePoolMetrics(
@@ -49,7 +50,6 @@ public class ExampleConfiguration {
 
     return new ApacheHttpClientJsonRequestJsonResponseTypedSpringRestClientDecoratorImplementation(
         clientManagerPairDto.restClient(),
-        clientManagerPairDto.manager(),
         CircuitBreaker.of("Circuit breakertje", CircuitBreakerConfig.ofDefaults()),
         RateLimiter.of("RateLimiter breakertje", RateLimiterConfig.ofDefaults()));
   }
