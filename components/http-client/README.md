@@ -39,9 +39,43 @@ rescue: [The Factory pattern](https://en.wikipedia.org/wiki/Factory_method_patte
 
 ### Structure (class diagram)
 
+```mermaid
+---
+title: Spring RestClient decorator factory and helper dto classes
+---
+classDiagram
+    class SpringRestClientFactory {
+        +createWithApachePoolingConnManager(configDto : ConfigurationDto) : HttpClientAndApachePoolingConnManagerDto$ 
+        +HttpClientAndApachePoolingConnManagerDto$
+        +ConfigurationDto$
+    }
+    class HttpClientAndApachePoolingConnManagerDto {
+        <<record>>
+        +RestClient restClient
+        +PoolingHttpClientConnectionManager manager
+    }
+    class ConfigurationDto {
+        <<record>>
+        +boolean bufferRequestResponse
+        +int connectionTimeoutMs
+        +int socketTimeoutMs
+        +int connectionRequestTimeoutMs
+        +int maxConnTotal
+        +int maxConnPerRoute
+        +int tlsHandshakeTimeout
+        +SSLContext sslContext
+        +PoolConcurrencyPolicy poolConcurrencyPolicy
+        +PoolReusePolicy poolReusePolicy
+        +TLSVersion[] tlsVersion
+    }
+```
+
 ### Behavior (functionality)
 
 ```mermaid
+---
+title: Spring RestClient decorator creation
+---
 sequenceDiagram
     create participant srcfConfig as SpringRestClientFactory.ConfigurationDto
     Client Code ->> srcfConfig: srcfConfig = create()
@@ -49,12 +83,12 @@ sequenceDiagram
     SpringRestClientFactory --) Client Code: SpringRestClientFactory.HttpClientAndApachePoolingConnManagerDto
     Client Code ->> OTLPApachePoolMetrics: configureOTLPApachePoolMetrics(dto.manager())
     create participant httpClient as ApacheHttpClientJsonRequestJsonResponseTypedSpringRestClientDecoratorImplementation
-    Client Code ->> httpClient: create(<br>dto.restClient()<br>dto.manager()<br>CircuitBreaker<br>RateLimiter)
+    Client Code ->> httpClient: create(<br>dto.restClient()<br>CircuitBreaker<br>RateLimiter)
 ```
 
 ## How it should work
 
-THe social desirable functionality is an http client that has a rate limiter
+The social desirable functionality is an http client that has a rate limiter
 and circuit breaker. However, that is nice to claim that it hás it, but are
 we sure those components are used the right way? What ís the right way?
 
